@@ -11,8 +11,8 @@ import (
 )
 
 type result struct {
-	Body string
-	Urls []string
+	Body string `json:"body"`
+	Urls []string `json:"urls"`
 }
 
 var m sync.Mutex
