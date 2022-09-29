@@ -64,7 +64,9 @@ func Crawl(url string, depth int, fetcher webFetcher) {
 	m.Unlock()
 
 	for _, u := range urls {
+		m.Lock()
 		if _, ok := fetcher[u]; !ok {
+			m.Unlock()
 			wg.Add(1)
 
 			go func(url string) {
