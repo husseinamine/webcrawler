@@ -66,8 +66,9 @@ func Crawl(url string, depth int, fetcher webFetcher) {
 
 	for _, u := range urls {
 		m.Lock()
-		if _, ok := fetcher[u]; !ok {
-			m.Unlock()
+		_, present := fetcher[u]
+		m.Unlock()
+		if !present {
 			wg.Add(1)
 
 			go func(url string) {
@@ -75,9 +76,6 @@ func Crawl(url string, depth int, fetcher webFetcher) {
 
 				Crawl(url, depth-1, fetcher)
 			}(u)
-		} else {
-			fmt.Println("Seen", u)
-			m.Unlock()
 		}
 	}
 
