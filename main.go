@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 )
 
 type result struct {
-	Body string `json:"body"`
+	Body string   `json:"body"`
 	Urls []string `json:"urls"`
 }
 
@@ -65,8 +66,9 @@ func Crawl(url string, depth int, fetcher webFetcher) {
 
 	for _, u := range urls {
 		m.Lock()
-		if _, ok := fetcher[u]; !ok {
-			m.Unlock()
+		_, present := fetcher[u]
+		m.Unlock()
+		if !present {
 			wg.Add(1)
 
 			go func(url string) {
@@ -81,9 +83,12 @@ func Crawl(url string, depth int, fetcher webFetcher) {
 }
 
 func main() {
+	depth := flag.Int("depth", 1, "crawling depth")
+	flag.Parse()
+
 	wf := webFetcher{}
 
-	Crawl("https://gobyexample.com/waitgroups", 1, wf)
+	Crawl("https://gobyexample.com/waitgroups", *depth, wf)
 
 	wg.Wait()
 
